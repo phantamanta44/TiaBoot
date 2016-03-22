@@ -12,7 +12,7 @@ public class CommandBuilder {
 		this.config = config;
 	}
 	
-	public String buildCommand() throws FileNotFoundException {
+	public String build() throws FileNotFoundException {
 		if (!config.getJavaHome().exists())
 			throw new FileNotFoundException(String.format("JVM not found on path %s!", config.getJavaHome().getAbsolutePath()));
 		File jvmExec = new File(config.getJavaHome(), "bin" + File.separatorChar + "java" + osDependentExt());

@@ -11,8 +11,8 @@ public class LaunchConfiguration {
 	private File jarFile, javaHome;
 	private String vmArgs;
 	
-	public LaunchConfiguration(File jarFile, String javaHome, String vmArgs) {
-		this.jarFile = jarFile != null ? jarFile : DEF_JAR_FILE;
+	public LaunchConfiguration(String jarFile, String javaHome, String vmArgs) {
+		this.jarFile = jarFile != null ? new File(jarFile) : DEF_JAR_FILE;
 		this.javaHome = javaHome != null ? new File(javaHome) : DEF_JAVA_HOME;
 		this.vmArgs = vmArgs != null ? vmArgs : DEF_VM_ARGS;
 	}

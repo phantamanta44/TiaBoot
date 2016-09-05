@@ -1,10 +1,20 @@
 package io.github.phantamanta44.tiabot.boot;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.zip.CRC32;
 
+import com.sun.xml.internal.bind.api.impl.NameConverter;
 import io.github.phantamanta44.tiabot.boot.launch.CommandBuilder;
 import io.github.phantamanta44.tiabot.boot.launch.ExitCode;
 import io.github.phantamanta44.tiabot.boot.launch.LaunchConfiguration;
@@ -33,10 +43,10 @@ public class Bootstrapper {
 			ex.printStackTrace();
 			fail(1);
 		}
+        LaunchConfiguration lc = new LaunchConfiguration(
+                config.get("jarFile"), config.get("javaHome"), config.get("vmArgs"), config.get("updateUrl"));
 		if (config.getBoolean("updateOnStart"))
-			updateCheck(true);
-		LaunchConfiguration lc = new LaunchConfiguration(
-				config.get("jarFile"), config.get("javaHome"), config.get("vmArgs"));
+			updateCheck(lc, true);
 		taskPool.submit(() -> boot(lc));
 	}
 
@@ -68,29 +78,49 @@ public class Bootstrapper {
 		case CONNECT_FAILURE:
 		case LOGIN_FAILURE:
 		case UNKNOWN:
+            logger.info("Bot terminated. Check configuration.");
 			fail(1);
 			break;
 		case ERRORED:
 		case REBOOT_REQUESTED:
+            logger.info("Bot terminated. Restarting.");
 			taskPool.submit(() -> boot(lc));
 			break;
 		case EXITED:
 		case TERMINATED:
-			logger.info("Bot terminated.");
+			logger.info("Bot terminated. Exiting.");
 			Runtime.getRuntime().exit(0);
 			break;
 		case UPDATE_REQUESTED:
+		    logger.info("Bot terminated. Update requested.");
 			taskPool.submit(() -> {
-				updateCheck(true);
+				updateCheck(lc, true);
 				boot(lc);
 			});
 			break;
 		}
 	}
 
-	private static boolean updateCheck(boolean doUpdate) {
-		// TODO Update checking
-		return false;
+	private static boolean updateCheck(LaunchConfiguration lc, boolean doUpdate) {
+		try {
+		    Path temp = Files.createTempFile("tiaboot_temp_", ".jar");
+            Files.copy(URI.create(lc.getUpdateUrl()).toURL().openStream(), temp);
+            CRC32 sum1 = new CRC32(), sum2 = new CRC32();
+            sum1.update(Files.readAllBytes(temp));
+            sum2.update(Files.readAllBytes(lc.getJarFile().toPath()));
+            if (sum1.getValue() == sum2.getValue()) {
+                logger.info("No update found.");
+                return false;
+            }
+            logger.info("Update found. Replacing old version...");
+            Files.move(temp, lc.getJarFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
+            logger.info("Update complete.");
+            return true;
+        } catch (IOException e) {
+		    logger.warn("Update failed!");
+		    e.printStackTrace();
+            return false;
+        }
 	}
 	
 	private static void fail(int code) {

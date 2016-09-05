@@ -9,12 +9,13 @@ public class LaunchConfiguration {
 	private static final String DEF_VM_ARGS = "";
 	
 	private File jarFile, javaHome;
-	private String vmArgs;
+	private String vmArgs, updateUrl;
 	
-	public LaunchConfiguration(String jarFile, String javaHome, String vmArgs) {
+	public LaunchConfiguration(String jarFile, String javaHome, String vmArgs, String updateUrl) {
 		this.jarFile = jarFile != null ? new File(jarFile) : DEF_JAR_FILE;
 		this.javaHome = javaHome != null ? new File(javaHome) : DEF_JAVA_HOME;
 		this.vmArgs = vmArgs != null ? vmArgs : DEF_VM_ARGS;
+		this.updateUrl = updateUrl;
 	}
 	
 	public File getJarFile() {
@@ -27,6 +28,10 @@ public class LaunchConfiguration {
 	
 	public String getVmArgs() {
 		return vmArgs;
+	}
+
+	public String getUpdateUrl() {
+		return updateUrl;
 	}
 	
 }

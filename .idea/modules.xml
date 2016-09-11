@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../D4JWrapper/D4JWrapper.iml" filepath="$PROJECT_DIR$/../D4JWrapper/D4JWrapper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../TiaBot2/TiaBot2.iml" filepath="$PROJECT_DIR$/../TiaBot2/TiaBot2.iml" />
       <module fileurl="file://$PROJECT_DIR$/tiaboot.iml" filepath="$PROJECT_DIR$/tiaboot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tiabot/tiabot.iml" filepath="$PROJECT_DIR$/../tiabot/tiabot.iml" />
     </modules>
   </component>
 </project>

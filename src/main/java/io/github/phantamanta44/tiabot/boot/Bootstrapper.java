@@ -1,25 +1,21 @@
 package io.github.phantamanta44.tiabot.boot;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.zip.CRC32;
-
-import com.sun.xml.internal.bind.api.impl.NameConverter;
 import io.github.phantamanta44.tiabot.boot.launch.CommandBuilder;
 import io.github.phantamanta44.tiabot.boot.launch.ExitCode;
 import io.github.phantamanta44.tiabot.boot.launch.LaunchConfiguration;
 import io.github.phantamanta44.tiabot.boot.util.IniConfig;
 import io.github.phantamanta44.tiabot.boot.util.LogWrapper;
+import org.apache.commons.io.IOUtils;
+
+import java.io.*;
+import java.lang.ref.WeakReference;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.file.*;
+import java.nio.file.attribute.FileAttribute;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.zip.CRC32;
 
 public class Bootstrapper {
 	
@@ -102,19 +98,22 @@ public class Bootstrapper {
 	}
 
 	private static boolean updateCheck(LaunchConfiguration lc, boolean doUpdate) {
-		try {
-		    Path temp = Files.createTempFile("tiaboot_temp_", ".jar");
-            Files.copy(URI.create(lc.getUpdateUrl()).toURL().openStream(), temp);
+		try (InputStream in = URI.create(lc.getUpdateUrl()).toURL().openStream()) {
+            byte[] newFile = IOUtils.toByteArray(in);
             CRC32 sum1 = new CRC32(), sum2 = new CRC32();
-            sum1.update(Files.readAllBytes(temp));
+            sum1.update(newFile);
             sum2.update(Files.readAllBytes(lc.getJarFile().toPath()));
             if (sum1.getValue() == sum2.getValue()) {
                 logger.info("No update found.");
                 return false;
             }
-            logger.info("Update found. Replacing old version...");
-            Files.move(temp, lc.getJarFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
-            logger.info("Update complete.");
+            if (doUpdate) {
+                logger.info("Update found. Replacing old version...");
+                Files.write(lc.getJarFile().toPath(), newFile, StandardOpenOption.TRUNCATE_EXISTING);
+                logger.info("Update complete.");
+            }
+            else
+                logger.info("Update found. Not updating automatically.");
             return true;
         } catch (IOException e) {
 		    logger.warn("Update failed!");

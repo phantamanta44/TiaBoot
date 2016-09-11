@@ -22,11 +22,17 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="D4JWrapper" />
         <module name="tiaboot" />
+        <module name="tiabot" />
+        <module name="TiaBot2" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="D4JWrapper" target="1.8" />
       <module name="tiaboot" target="1.8" />
+      <module name="tiabot" target="1.8" />
+      <module name="TiaBot2" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

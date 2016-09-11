@@ -45,6 +45,9 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/../tiabot/pom.xml" />
+        <option value="$PROJECT_DIR$/../D4JWrapper/pom.xml" />
+        <option value="$PROJECT_DIR$/../TiaBot2/pom.xml" />
       </list>
     </option>
   </component>

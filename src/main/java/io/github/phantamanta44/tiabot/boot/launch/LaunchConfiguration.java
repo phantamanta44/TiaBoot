@@ -5,7 +5,7 @@ import java.io.File;
 public class LaunchConfiguration {
 
 	private static final File DEF_JAR_FILE = new File("tiabot.jar");
-	private static final File DEF_JAVA_HOME = new File(System.getenv("JAVA_HOME"));
+	private static final File DEF_JAVA_HOME = new File(System.getProperty("java.home"));
 	private static final String DEF_VM_ARGS = "";
 	
 	private File jarFile, javaHome;
